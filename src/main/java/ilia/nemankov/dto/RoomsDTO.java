@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class RoomsDTO {
 
+    private Integer roomsId;
     private String name;
     private Integer availableRooms;
 

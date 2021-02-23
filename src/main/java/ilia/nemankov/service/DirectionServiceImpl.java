@@ -23,6 +23,8 @@ public class DirectionServiceImpl implements DirectionService {
         for (City city : cities) {
             DirectionDTO dto = new DirectionDTO();
             dto.setDirection(city.getName() + ", " + city.getCountry().getName());
+            dto.setCity(city.getId());
+            dto.setCountry(city.getCountry().getId());
             results.add(dto);
         }
 

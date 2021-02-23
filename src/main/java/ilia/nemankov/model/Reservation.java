@@ -29,4 +29,8 @@ public class Reservation {
     @Column(name = "DEPARTURE_DATE")
     private Date departureDate;
 
+    @ManyToOne
+    @JoinColumn(name = "CONFIGURATION")
+    private Configuration configuration;
+
 }

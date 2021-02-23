@@ -22,7 +22,7 @@ public class Rooms {
     @Column(name = "ROOMS_NUMBER")
     private Integer roomsNumber;
 
-    @OneToMany(mappedBy = "rooms", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "rooms")
     private List<Configuration> configurations;
 
 }

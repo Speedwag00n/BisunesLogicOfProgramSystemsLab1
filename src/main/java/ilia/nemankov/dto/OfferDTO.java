@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class OfferDTO {
 
+    private Integer hotelId;
     private String hotelName;
     private String address;
     private HotelType hotelType;

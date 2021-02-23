@@ -25,7 +25,7 @@ public class FilterController {
 
     @GetMapping("/api/hotels")
     public List<OfferDTO> getSuitableHotels(
-            @RequestParam(value = "country", required = true) Integer country,
+            @RequestParam(value = "country", required = false) Integer country,
             @RequestParam(value = "city", required = false) Integer city,
             @RequestParam(value = "hotel_type", required = false) List<String> hotelTypes,
             @RequestParam(value = "stars", required = false) List<Integer> stars,

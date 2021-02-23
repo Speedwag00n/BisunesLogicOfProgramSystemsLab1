@@ -34,7 +34,7 @@ public class Hotel {
 
     private Integer stars;
 
-    @OneToMany(mappedBy = "hotel", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "hotel")
     private List<Rooms> rooms;
 
 }

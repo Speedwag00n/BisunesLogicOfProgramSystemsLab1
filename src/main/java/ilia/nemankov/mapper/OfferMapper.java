@@ -16,6 +16,7 @@ public class OfferMapper {
     public OfferDTO entityToDto(Hotel hotel) {
         OfferDTO offerDTO = new OfferDTO();
 
+        offerDTO.setHotelId(hotel.getId());
         offerDTO.setHotelName(hotel.getName());
         offerDTO.setAddress(hotel.getAddress() + ", " + hotel.getCity().getName() + ", " + hotel.getCity().getCountry().getName());
         offerDTO.setHotelType(hotel.getHotelType());
@@ -26,6 +27,7 @@ public class OfferMapper {
         for (Rooms rooms : hotel.getRooms()) {
             RoomsDTO roomsDTO = new RoomsDTO();
 
+            roomsDTO.setRoomsId(rooms.getId());
             roomsDTO.setName(rooms.getName());
             roomsDTO.setAvailableRooms(rooms.getRoomsNumber());
             roomsDTO.setConfigurations(new ArrayList<>());
@@ -35,6 +37,7 @@ public class OfferMapper {
             for (Configuration configuration : rooms.getConfigurations()) {
                 ConfigurationDTO configurationDTO = new ConfigurationDTO();
 
+                configurationDTO.setConfigurationId(configuration.getId());
                 configurationDTO.setCapacity(configuration.getCapacity());
                 configurationDTO.setFoodType(configuration.getFoodType());
                 configurationDTO.setPrice(configuration.getPrice());
