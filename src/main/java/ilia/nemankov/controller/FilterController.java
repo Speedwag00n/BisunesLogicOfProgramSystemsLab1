@@ -4,11 +4,13 @@ import ilia.nemankov.dto.OfferDTO;
 import ilia.nemankov.service.DirectionService;
 import ilia.nemankov.service.FilterService;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 
 @AllArgsConstructor
@@ -31,18 +33,22 @@ public class FilterController {
     public ResponseEntity getSuitableHotels(
             @RequestParam(value = "country", required = false) Integer country,
             @RequestParam(value = "city", required = false) Integer city,
-            @RequestParam(value = "hotel_type", required = false) List<String> hotelTypes,
+            @RequestParam(value = "arrivalDate", required = true) @DateTimeFormat(pattern="yyyy-MM-dd") Date arrivalDate,
+            @RequestParam(value = "departureDate", required = true) @DateTimeFormat(pattern="yyyy-MM-dd") Date departureDate,
+            @RequestParam(value = "hotelTypes", required = false) List<String> hotelTypes,
             @RequestParam(value = "stars", required = false) List<Integer> stars,
-            @RequestParam(value = "people_number", required = true) Integer peopleNumber,
+            @RequestParam(value = "peopleNumber", required = true) Integer peopleNumber,
             @RequestParam(value = "food", required = false) List<String> food,
-            @RequestParam(value = "min_price", required = false) Integer minPrice,
-            @RequestParam(value = "max_price", required = false) Integer maxPrice
+            @RequestParam(value = "minPrice", required = false) Integer minPrice,
+            @RequestParam(value = "maxPrice", required = false) Integer maxPrice
     ) {
 
         try {
             List<OfferDTO> results = filterService.getSuitableHotels(
                     country,
                     city,
+                    arrivalDate,
+                    departureDate,
                     hotelTypes,
                     stars,
                     peopleNumber,
