@@ -1,5 +1,6 @@
 package ilia.nemankov.repository.specification;
 
+import ilia.nemankov.model.City;
 import ilia.nemankov.model.Hotel;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
@@ -11,17 +12,15 @@ import javax.persistence.criteria.Root;
 import java.util.List;
 
 @AllArgsConstructor
-public class FindHotelByStars implements Specification<Hotel> {
+public class FindHotelByCity implements Specification<Hotel> {
 
-    private final List<Integer> stars;
+    private final Integer cityId;
 
     @Override
     public Predicate toPredicate(Root<Hotel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-        Predicate[] predicates = new Predicate[stars.size()];
-        for (int i = 0; i < stars.size(); i++) {
-            predicates[i] = (criteriaBuilder.equal(root.get("stars"), stars.get(i)));
-        }
-        return criteriaBuilder.or(predicates);
+        City city = new City();
+        city.setId(cityId);
+        return criteriaBuilder.and(criteriaBuilder.equal(root.get("city"), city));
     }
 
 }

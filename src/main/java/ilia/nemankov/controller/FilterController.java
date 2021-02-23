@@ -25,23 +25,25 @@ public class FilterController {
 
     @GetMapping("/api/hotels")
     public List<OfferDTO> getSuitableHotels(
-            @RequestParam(value = "country", required = true) String country,
-            @RequestParam(value = "city", required = false) String city,
-            @RequestParam(value = "hotel_type", required = false) List<String> hotel_type,
+            @RequestParam(value = "country", required = true) Integer country,
+            @RequestParam(value = "city", required = false) Integer city,
+            @RequestParam(value = "hotel_type", required = false) List<String> hotelTypes,
             @RequestParam(value = "stars", required = false) List<Integer> stars,
             @RequestParam(value = "people_number", required = true) Integer peopleNumber,
             @RequestParam(value = "food", required = false) List<String> food,
-            @RequestParam(value = "price_interval", required = false) List<String> priceInterval
+            @RequestParam(value = "min_price", required = false) Integer minPrice,
+            @RequestParam(value = "max_price", required = false) Integer maxPrice
     ) {
 
         return filterService.getSuitableHotels(
                 country,
                 city,
-                hotel_type,
+                hotelTypes,
                 stars,
                 peopleNumber,
                 food,
-                priceInterval
+                minPrice,
+                maxPrice
         );
 
     }

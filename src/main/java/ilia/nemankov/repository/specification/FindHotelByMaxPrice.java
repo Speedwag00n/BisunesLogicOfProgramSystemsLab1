@@ -8,20 +8,15 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.List;
 
 @AllArgsConstructor
-public class FindHotelByStars implements Specification<Hotel> {
+public class FindHotelByMaxPrice implements Specification<Hotel> {
 
-    private final List<Integer> stars;
+    private final Integer maxPrice;
 
     @Override
     public Predicate toPredicate(Root<Hotel> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
-        Predicate[] predicates = new Predicate[stars.size()];
-        for (int i = 0; i < stars.size(); i++) {
-            predicates[i] = (criteriaBuilder.equal(root.get("stars"), stars.get(i)));
-        }
-        return criteriaBuilder.or(predicates);
+        return criteriaBuilder.and(criteriaBuilder.lessThanOrEqualTo(root.join("rooms").join("configurations").get("price"), maxPrice));
     }
 
 }
