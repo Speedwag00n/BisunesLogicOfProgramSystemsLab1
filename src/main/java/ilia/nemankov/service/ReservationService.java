@@ -1,9 +1,9 @@
 package ilia.nemankov.service;
 
-import ilia.nemankov.dto.ReservationRequestDTO;
+import ilia.nemankov.dto.ReservationDTO;
 
 public interface ReservationService {
 
-    void makeReservation(ReservationRequestDTO reservationRequestDTO);
+    ReservationDTO makeReservation(ReservationDTO reservationRequestDTO);
 
 }
