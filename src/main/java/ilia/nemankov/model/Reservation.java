@@ -13,10 +13,6 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "HOTEL")
-    private Hotel hotel;
-
     private String name;
 
     private String surname;

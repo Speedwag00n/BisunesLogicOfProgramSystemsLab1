@@ -44,7 +44,7 @@ public class FilterServiceImpl implements FilterService {
 
         Specification<Hotel> specification = new HotelSpecification(city, country, hotelTypes, stars, food, peopleNumber, minPrice, maxPrice);
 
-        List<Hotel> hotels = hotelRepository.findAll(specification, PageRequest.of(0, 100)).getContent();
+        List<Hotel> hotels = hotelRepository.findAll(specification);
 
         List<OfferDTO> results = new ArrayList<>();
         for (Hotel hotel : hotels) {
