@@ -1,7 +1,7 @@
 package ilia.nemankov.service;
 
 import ilia.nemankov.dto.DirectionDTO;
-import ilia.nemankov.model.Direction;
+import ilia.nemankov.model.City;
 import ilia.nemankov.repository.DirectionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,12 +17,12 @@ public class DirectionServiceImpl implements DirectionService {
 
     @Override
     public List<DirectionDTO> getDirections() {
-        List<Direction> directions =  directionRepository.findAll();
+        List<City> cities =  directionRepository.findAll();
         List<DirectionDTO> results = new ArrayList<>();
 
-        for (Direction direction : directions) {
+        for (City city : cities) {
             DirectionDTO dto = new DirectionDTO();
-            dto.setDirection(direction.getName());
+            dto.setDirection(city.getName() + ", " + city.getCountry().getName());
             results.add(dto);
         }
 

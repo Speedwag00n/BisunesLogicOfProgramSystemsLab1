@@ -1,6 +1,7 @@
 package ilia.nemankov.model;
 
 import lombok.Data;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
@@ -19,6 +20,8 @@ public class Configuration {
     private Integer capacity;
 
     @Column(name = "FOOD")
+    @Enumerated(EnumType.STRING)
+    @Type(type = "pgsql_enum")
     private FoodType foodType;
 
     private Integer price;

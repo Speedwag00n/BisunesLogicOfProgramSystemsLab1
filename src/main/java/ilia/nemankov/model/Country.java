@@ -9,7 +9,7 @@ import javax.persistence.Id;
 
 @Entity
 @Data
-public class Direction {
+public class Country {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
