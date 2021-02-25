@@ -14,6 +14,7 @@ import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +45,15 @@ public class FilterServiceImpl implements FilterService {
 
         if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
             throw new IllegalArgumentException("minPrice can not be greater than maxPrice");
+        }
+
+        long timeDifference = departureDate.getTime() - arrivalDate.getTime();
+        int numberOfDays = (int) TimeUnit.DAYS.convert(timeDifference, TimeUnit.MILLISECONDS) + 1;
+        if (minPrice != null) {
+            minPrice /= numberOfDays;
+        }
+        if (maxPrice != null) {
+            maxPrice /= numberOfDays;
         }
 
         Specification<Configuration> specification = new ConfigurationSpecification(city, country, hotelTypes, stars, food, peopleNumber, minPrice, maxPrice);
