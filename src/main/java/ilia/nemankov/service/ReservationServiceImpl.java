@@ -6,6 +6,8 @@ import ilia.nemankov.model.Reservation;
 import ilia.nemankov.repository.ReservationRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +21,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final ConfigurationService configurationService;
 
     @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public ReservationDTO makeReservation(ReservationDTO reservationDTO) {
         if (reservationDTO.getArrivalDate().after(reservationDTO.getDepartureDate())) {
             throw new IllegalArgumentException("Arrival date can not be after departure date");
@@ -34,19 +37,17 @@ public class ReservationServiceImpl implements ReservationService {
 
         Reservation reservation = reservationMapper.dtoToEntity(reservationDTO);
 
-        synchronized (this) {
-            if (!configurationService.isConfigurationAvailable(
-                    reservation.getConfiguration(),
-                    reservation.getArrivalDate(),
-                    reservation.getDepartureDate())
-            ) {
-                throw new IllegalArgumentException("There isn't any free room with selected configuration");
-            }
-
-            Reservation entity = reservationRepository.save(reservation);
-
-            return reservationMapper.entityToDto(entity);
+        if (!configurationService.isConfigurationAvailable(
+                reservation.getConfiguration(),
+                reservation.getArrivalDate(),
+                reservation.getDepartureDate())
+        ) {
+            throw new IllegalArgumentException("There isn't any free room with selected configuration");
         }
+
+        Reservation entity = reservationRepository.save(reservation);
+
+        return reservationMapper.entityToDto(entity);
     }
 
 }
