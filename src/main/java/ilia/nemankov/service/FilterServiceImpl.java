@@ -1,7 +1,6 @@
 package ilia.nemankov.service;
 
 import ilia.nemankov.dto.OfferDTO;
-import ilia.nemankov.mapper.OfferMapper;
 import ilia.nemankov.model.Configuration;
 import ilia.nemankov.repository.ConfigurationRepository;
 import ilia.nemankov.repository.specification.ConfigurationSpecification;
@@ -10,8 +9,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.constraints.Min;
-import java.util.ArrayList;
+import javax.validation.constraints.Positive;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +24,7 @@ public class FilterServiceImpl implements FilterService {
 
     private final ConfigurationRepository configurationRepository;
     private final ConfigurationService configurationService;
-    private final OfferMapper offerMapper;
+    private final OfferService offerService;
 
     @Override
     public List<OfferDTO> getSuitableHotels(
@@ -34,18 +34,12 @@ public class FilterServiceImpl implements FilterService {
             Date departureDate,
             List<String> hotelTypes,
             List<Integer> stars,
-            Integer peopleNumber,
+            @Positive Integer peopleNumber,
             List<String> food,
             @Min(0) Integer minPrice,
             @Min(0) Integer maxPrice
     ) {
-        if (city == null && country == null) {
-            throw new IllegalArgumentException("city or country must be specified");
-        }
-
-        if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
-            throw new IllegalArgumentException("minPrice can not be greater than maxPrice");
-        }
+        validate(country, city, minPrice, maxPrice);
 
         long timeDifference = departureDate.getTime() - arrivalDate.getTime();
         int numberOfDays = (int) TimeUnit.DAYS.convert(timeDifference, TimeUnit.MILLISECONDS) + 1;
@@ -62,7 +56,17 @@ public class FilterServiceImpl implements FilterService {
 
         configurations = configurations.stream().filter(element -> configurationService.isConfigurationAvailable(element, arrivalDate, departureDate)).collect(Collectors.toList());
 
-        return offerMapper.entitiesToDtos(configurations);
+        return offerService.createOffers(configurations);
+    }
+
+    private void validate(Integer country, Integer city, @Min(0) Integer minPrice, @Min(0) Integer maxPrice) {
+        if (city == null && country == null) {
+            throw new IllegalArgumentException("city or country must be specified");
+        }
+
+        if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+            throw new IllegalArgumentException("minPrice can not be greater than maxPrice");
+        }
     }
 
 }

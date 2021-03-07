@@ -20,20 +20,12 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository reservationRepository;
     private final ConfigurationService configurationService;
 
+    private final Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public ReservationDTO makeReservation(ReservationDTO reservationDTO) {
-        if (reservationDTO.getArrivalDate().after(reservationDTO.getDepartureDate())) {
-            throw new IllegalArgumentException("Arrival date can not be after departure date");
-        }
-
-        Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = emailPattern.matcher(reservationDTO.getEmail());
-
-        if (!matcher.find()) {
-            System.out.println(reservationDTO.getEmail());
-            throw new IllegalArgumentException("Email is invalid");
-        }
+        validate(reservationDTO);
 
         Reservation reservation = reservationMapper.dtoToEntity(reservationDTO);
 
@@ -42,12 +34,24 @@ public class ReservationServiceImpl implements ReservationService {
                 reservation.getArrivalDate(),
                 reservation.getDepartureDate())
         ) {
-            throw new IllegalArgumentException("There isn't any free room with selected configuration");
+            throw new BusyConfigurationException("There isn't any free room with selected configuration");
         }
 
         Reservation entity = reservationRepository.save(reservation);
 
         return reservationMapper.entityToDto(entity);
+    }
+
+    private void validate(ReservationDTO reservationDTO) {
+        if (reservationDTO.getArrivalDate().after(reservationDTO.getDepartureDate())) {
+            throw new IllegalArgumentException("Arrival date can not be after departure date");
+        }
+
+        Matcher matcher = emailPattern.matcher(reservationDTO.getEmail());
+
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("Email is invalid");
+        }
     }
 
 }

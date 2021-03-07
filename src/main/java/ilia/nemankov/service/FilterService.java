@@ -3,6 +3,7 @@ package ilia.nemankov.service;
 import ilia.nemankov.dto.OfferDTO;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface FilterService {
             Date departureDate,
             List<String> hotelTypes,
             List<Integer> stars,
-            Integer peopleNumber,
+            @Positive Integer peopleNumber,
             List<String> food,
             @Min(0) Integer minPrice,
             @Min(0) Integer maxPrice
