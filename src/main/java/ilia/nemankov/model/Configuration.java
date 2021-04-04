@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -25,5 +26,12 @@ public class Configuration {
     private FoodType foodType;
 
     private Integer price;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "CONFIGURATION_CONVENIENCE",
+            joinColumns = @JoinColumn(name = "CONFIGURATION"),
+            inverseJoinColumns = @JoinColumn(name = "CONVENIENCE")
+    )
+    private List<Convenience> conveniences;
 
 }

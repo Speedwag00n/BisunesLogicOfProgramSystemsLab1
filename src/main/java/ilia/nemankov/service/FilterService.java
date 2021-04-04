@@ -1,6 +1,6 @@
 package ilia.nemankov.service;
 
-import ilia.nemankov.dto.OfferDTO;
+import ilia.nemankov.dto.HotelDTO;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface FilterService {
 
-    List<OfferDTO> getSuitableHotels(
+    List<HotelDTO> getSuitableHotels(
             Integer country,
             Integer city,
             Date arrivalDate,

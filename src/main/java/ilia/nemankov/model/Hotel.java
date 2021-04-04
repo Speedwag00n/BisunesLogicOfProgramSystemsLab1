@@ -37,4 +37,6 @@ public class Hotel {
     @OneToMany(mappedBy = "hotel")
     private List<Rooms> rooms;
 
+    private String owner;
+
 }

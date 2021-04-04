@@ -1,6 +1,6 @@
 package ilia.nemankov.controller;
 
-import ilia.nemankov.dto.OfferDTO;
+import ilia.nemankov.dto.HotelDTO;
 import ilia.nemankov.service.DirectionService;
 import ilia.nemankov.service.FilterService;
 import lombok.AllArgsConstructor;
@@ -44,7 +44,7 @@ public class FilterController {
     ) {
 
         try {
-            List<OfferDTO> results = filterService.getSuitableHotels(
+            List<HotelDTO> results = filterService.getSuitableHotels(
                     country,
                     city,
                     arrivalDate,

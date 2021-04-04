@@ -1,6 +1,6 @@
 package ilia.nemankov.service;
 
-import ilia.nemankov.dto.OfferDTO;
+import ilia.nemankov.dto.HotelDTO;
 import ilia.nemankov.model.Configuration;
 import ilia.nemankov.repository.ConfigurationRepository;
 import ilia.nemankov.repository.specification.ConfigurationSpecification;
@@ -9,7 +9,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import java.util.Date;
@@ -27,7 +26,7 @@ public class FilterServiceImpl implements FilterService {
     private final OfferService offerService;
 
     @Override
-    public List<OfferDTO> getSuitableHotels(
+    public List<HotelDTO> getSuitableHotels(
             Integer country,
             Integer city,
             Date arrivalDate,

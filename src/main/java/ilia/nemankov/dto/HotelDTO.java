@@ -6,11 +6,14 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class OfferDTO {
+public class HotelDTO {
 
     private Integer hotelId;
     private String hotelName;
     private String address;
+    private Integer cityId;
+    private String cityName;
+    private String countryName;
     private HotelType hotelType;
     private Integer stars;
     private String description;

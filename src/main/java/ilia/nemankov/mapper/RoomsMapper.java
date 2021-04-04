@@ -1,8 +1,6 @@
 package ilia.nemankov.mapper;
 
-import ilia.nemankov.dto.OfferDTO;
 import ilia.nemankov.dto.RoomsDTO;
-import ilia.nemankov.model.Hotel;
 import ilia.nemankov.model.Rooms;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,6 +20,16 @@ public class RoomsMapper {
         dto.setConfigurations(new ArrayList<>());
 
         return dto;
+    }
+
+    public Rooms dtoToEntity(RoomsDTO dto) {
+        Rooms entity = new Rooms();
+
+        entity.setId(dto.getRoomsId());
+        entity.setName(dto.getName());
+        entity.setRoomsNumber(dto.getAvailableRooms());
+
+        return entity;
     }
 
 }

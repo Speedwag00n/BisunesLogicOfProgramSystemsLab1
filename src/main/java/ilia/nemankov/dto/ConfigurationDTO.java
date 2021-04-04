@@ -3,6 +3,8 @@ package ilia.nemankov.dto;
 import ilia.nemankov.model.FoodType;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ConfigurationDTO {
 
@@ -10,5 +12,6 @@ public class ConfigurationDTO {
     private Integer capacity;
     private FoodType foodType;
     private Integer price;
+    private List<ConvenienceDTO> conveniences;
 
 }
