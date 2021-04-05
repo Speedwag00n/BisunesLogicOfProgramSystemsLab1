@@ -47,6 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.GET, "/api/hotel/{id}").authenticated()
                 .antMatchers(HttpMethod.PUT, "/api/hotel/update").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/reservation").authenticated()
                 .antMatchers(HttpMethod.POST, "/api/logout").authenticated()
 
                 .and()

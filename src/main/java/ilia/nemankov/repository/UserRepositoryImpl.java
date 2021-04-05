@@ -47,6 +47,7 @@ public class UserRepositoryImpl implements UserRepository {
                     user.setLogin(element.getElementsByTagName("login").item(0).getTextContent());
                     user.setPassword(element.getElementsByTagName("password").item(0).getTextContent());
                     user.setLastLogout(getDateFormat().parse(element.getElementsByTagName("lastLogout").item(0).getTextContent()));
+                    user.setBonuses(Integer.parseInt(element.getElementsByTagName("bonuses").item(0).getTextContent()));
                     Set<String> roles = new HashSet<>();
                     user.setRoles(roles);
                     String rolesString = element.getElementsByTagName("roles").item(0).getTextContent();
@@ -97,6 +98,9 @@ public class UserRepositoryImpl implements UserRepository {
                             case "roles":
                                 userChildren.item(j).setTextContent(String.join(",", user.getRoles().toArray(new String[0])));
                                 break;
+                            case "bonuses":
+                                userChildren.item(j).setTextContent(user.getBonuses() + "");
+                                break;
                         }
                     }
                     saveFile(document);
@@ -130,11 +134,14 @@ public class UserRepositoryImpl implements UserRepository {
             lastLogout.appendChild(document.createTextNode(getDateFormat().format(user.getLastLogout())));
             Element roles = document.createElement("roles");
             roles.appendChild(document.createTextNode(String.join(",", user.getRoles().toArray(new String[0]))));
+            Element bonuses = document.createElement("bonuses");
+            bonuses.appendChild(document.createTextNode(user.getBonuses() + ""));
 
             newUser.appendChild(login);
             newUser.appendChild(password);
             newUser.appendChild(lastLogout);
             newUser.appendChild(roles);
+            newUser.appendChild(bonuses);
 
             root.appendChild(newUser);
 

@@ -18,4 +18,6 @@ public class User {
 
     private Set<String> roles;
 
+    private Integer bonuses;
+
 }

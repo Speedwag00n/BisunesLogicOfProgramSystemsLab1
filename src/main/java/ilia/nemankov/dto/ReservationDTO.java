@@ -21,5 +21,7 @@ public class ReservationDTO {
     private Date arrivalDate;
     @NotNull
     private Date departureDate;
+    @NotNull
+    private Boolean useBonuses;
 
 }
