@@ -23,6 +23,7 @@ import javax.transaction.*;
 import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,12 +62,15 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationDTO makeReservation(ReservationDTO reservationDTO) {
+        Reservation entity;
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByLogin(authentication.getName());
+        Integer oldUserBonuses = user.getBonuses();
+
         try {
             userTransaction.begin();
 
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-            User user = userRepository.findByLogin(authentication.getName());
 
             validate(reservationDTO);
 
@@ -77,6 +81,7 @@ public class ReservationServiceImpl implements ReservationService {
                     reservation.getArrivalDate(),
                     reservation.getDepartureDate())
             ) {
+                userTransaction.rollback();
                 throw new BusyConfigurationException("There isn't any free room with selected configuration");
             }
 
@@ -85,38 +90,44 @@ public class ReservationServiceImpl implements ReservationService {
             if (reservationDTO.getUseBonuses()) {
                 int usedBonuses = mustPay <= user.getBonuses() ? mustPay : user.getBonuses();
                 mustPay -= usedBonuses;
-                user.setBonuses(user.getBonuses() - usedBonuses + (int)Math.ceil(mustPay * bonusesPercent));
+                long timeDifference = reservation.getDepartureDate().getTime() - reservation.getArrivalDate().getTime();
+                int numberOfDays = (int) TimeUnit.DAYS.convert(timeDifference, TimeUnit.MILLISECONDS) + 1;
+                user.setBonuses(user.getBonuses() - usedBonuses + (int)Math.ceil(mustPay * numberOfDays* bonusesPercent));
             }
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             Map<String, Object> body = new HashMap<>();
-            body.put("amount", -1);
+            body.put("amount", mustPay);
+
+            userRepository.save(user);
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(paymentsURL, requestEntity, String.class);
 
+            entity = reservationRepository.save(reservation);
+
             if (!response.getStatusCode().equals(HttpStatus.OK)) {
                 userTransaction.rollback();
+                user.setBonuses(oldUserBonuses);
+                userRepository.save(user);
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Payment wasn't successful");
             }
 
-            Reservation entity = reservationRepository.save(reservation);
-
-            userRepository.save(user);
-
             userTransaction.commit();
-
-            return reservationMapper.entityToDto(entity);
         } catch (NotSupportedException | SystemException | RollbackException | HeuristicMixedException | HeuristicRollbackException e) {
             try {
                 userTransaction.rollback();
+                user.setBonuses(oldUserBonuses);
+                userRepository.save(user);
             } catch (SystemException e1) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Reservation wasn't done", e1);
             }
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Reservation wasn't done", e);
         }
+
+        return reservationMapper.entityToDto(entity);
     }
 
     private void validate(ReservationDTO reservationDTO) {
