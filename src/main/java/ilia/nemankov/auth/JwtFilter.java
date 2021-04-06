@@ -6,12 +6,14 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -54,12 +56,10 @@ public class JwtFilter extends OncePerRequestFilter {
             try {
                 username = jwtUtils.getUsernameFromToken(jwtToken);
             } catch (IllegalArgumentException e) {
-
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid JWT token", e);
             } catch (ExpiredJwtException e) {
-
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "JWT token was expired", e);
             }
-        } else {
-
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

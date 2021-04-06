@@ -23,5 +23,11 @@ public class ReservationDTO {
     private Date departureDate;
     @NotNull
     private Boolean useBonuses;
+    @NotNull
+    private String cardNumber;
+    @NotNull
+    private String expiryDate;
+    @NotNull
+    private String cvc;
 
 }

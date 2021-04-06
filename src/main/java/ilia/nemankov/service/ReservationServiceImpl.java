@@ -7,9 +7,7 @@ import ilia.nemankov.model.User;
 import ilia.nemankov.repository.ConfigurationRepository;
 import ilia.nemankov.repository.ReservationRepository;
 import ilia.nemankov.repository.UserRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
@@ -18,9 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.transaction.*;
-import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +49,9 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     private final Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    private final Pattern cardNumberPattern = Pattern.compile("^[0-9]{16}$", Pattern.CASE_INSENSITIVE);
+    private final Pattern expiryDatePattern = Pattern.compile("^[0-9]{2}/[0-9]{2}$", Pattern.CASE_INSENSITIVE);
+    private final Pattern cvcPattern = Pattern.compile("^[0-9]{3}$", Pattern.CASE_INSENSITIVE);
 
     @Value("${payments.url}")
     private String paymentsURL;
@@ -69,10 +68,9 @@ public class ReservationServiceImpl implements ReservationService {
         Integer oldUserBonuses = user.getBonuses();
 
         try {
-            userTransaction.begin();
-
-
             validate(reservationDTO);
+
+            userTransaction.begin();
 
             Reservation reservation = reservationMapper.dtoToEntity(reservationDTO);
 
@@ -99,6 +97,9 @@ public class ReservationServiceImpl implements ReservationService {
             headers.setContentType(MediaType.APPLICATION_JSON);
 
             Map<String, Object> body = new HashMap<>();
+            body.put("cardNumber", reservationDTO.getCardNumber());
+            body.put("expiryDate", reservationDTO.getExpiryDate());
+            body.put("cvc", reservationDTO.getCvc());
             body.put("amount", mustPay);
 
             userRepository.save(user);
@@ -135,10 +136,28 @@ public class ReservationServiceImpl implements ReservationService {
             throw new IllegalArgumentException("Arrival date can not be after departure date");
         }
 
-        Matcher matcher = emailPattern.matcher(reservationDTO.getEmail());
+        Matcher emailMatcher = emailPattern.matcher(reservationDTO.getEmail());
 
-        if (!matcher.find()) {
+        if (!emailMatcher.find()) {
             throw new IllegalArgumentException("Email is invalid");
+        }
+
+        Matcher cardNumberMatcher = cardNumberPattern.matcher(reservationDTO.getCardNumber());
+
+        if (!cardNumberMatcher.find()) {
+            throw new IllegalArgumentException("Card number is invalid");
+        }
+
+        Matcher expiryDateMatcher = expiryDatePattern.matcher(reservationDTO.getExpiryDate());
+
+        if (!expiryDateMatcher.find()) {
+            throw new IllegalArgumentException("Expiry date is invalid");
+        }
+
+        Matcher cvcMatcher = cvcPattern.matcher(reservationDTO.getCvc());
+
+        if (!cvcMatcher.find()) {
+            throw new IllegalArgumentException("CVC is invalid");
         }
     }
 
