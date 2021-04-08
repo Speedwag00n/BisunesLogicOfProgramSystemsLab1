@@ -3,6 +3,7 @@ package ilia.nemankov.repository;
 import ilia.nemankov.model.User;
 import ilia.nemankov.service.LoginInUseException;
 import ilia.nemankov.service.UsersFileException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.ResourceUtils;
 import org.w3c.dom.Document;
@@ -154,7 +155,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private Document getDocument() throws IOException, SAXException, ParserConfigurationException {
-        File usersFile = ResourceUtils.getFile("classpath:users.xml");
+        File usersFile = ResourceUtils.getFile("users.xml");
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
         return documentBuilder.parse(usersFile);
@@ -167,7 +168,7 @@ public class UserRepositoryImpl implements UserRepository {
     private void saveFile(Document document) throws TransformerException, FileNotFoundException {
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         DOMSource source = new DOMSource(document);
-        StreamResult result = new StreamResult(ResourceUtils.getFile("classpath:users.xml"));
+        StreamResult result = new StreamResult(ResourceUtils.getFile("users.xml"));
 
         transformer.transform(source, result);
     }
