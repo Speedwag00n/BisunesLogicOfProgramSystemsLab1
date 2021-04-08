@@ -27,7 +27,7 @@ public class Configuration {
 
     private Integer price;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "CONFIGURATION_CONVENIENCE",
             joinColumns = @JoinColumn(name = "CONFIGURATION"),
             inverseJoinColumns = @JoinColumn(name = "CONVENIENCE")

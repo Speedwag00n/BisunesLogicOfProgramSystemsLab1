@@ -34,7 +34,7 @@ public class Hotel {
 
     private Integer stars;
 
-    @OneToMany(mappedBy = "hotel")
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Rooms> rooms;
 
     private String owner;

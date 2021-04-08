@@ -41,59 +41,45 @@ public class HotelServiceImpl implements HotelService {
     private final ConfigurationRepository configurationRepository;
     private final CityRepository cityRepository;
 
-    private final UserTransaction userTransaction;
-
     @Override
     public void editHotel(HotelDTO hotelDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        try {
-            userTransaction.begin();
+        Hotel currentHotel = hotelRepository.findById(hotelDTO.getHotelId()).get();
+        Hotel hotel = hotelMapper.dtoToEntity(hotelDTO);
 
-            Hotel currentHotel = hotelRepository.findById(hotelDTO.getHotelId()).get();
-            Hotel hotel = hotelMapper.dtoToEntity(hotelDTO);
-
-            if (authentication == null || (authentication.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ADMIN"))
-                    && !currentHotel.getOwner().equals(authentication.getName()))) {
-                throw new NotAHotelOwnerException("Current user isn't an admin or an owner of the current hotel");
-            }
-
-            hotel.setCity(cityRepository.findById(hotelDTO.getCityId()).get());
-
-            List<Rooms> roomsList = new ArrayList<>();
-            for (RoomsDTO roomsDTO : hotelDTO.getRooms()) {
-                Rooms rooms = roomsMapper.dtoToEntity(roomsDTO);
-                rooms.setHotel(hotel);
-                roomsList.add(rooms);
-
-                List<Configuration> configurationList = new ArrayList<>();
-                for (ConfigurationDTO configurationDTO : roomsDTO.getConfigurations()) {
-                    Configuration configuration = configurationMapper.dtoToEntity(configurationDTO);
-                    configuration.setRooms(rooms);
-                    List<Convenience> conveniences = new ArrayList<>();
-                    configuration.setConveniences(conveniences);
-
-                    for (ConvenienceDTO convenienceDTO : configurationDTO.getConveniences()) {
-                        Convenience convenience = convenienceMapper.dtoToEntity(convenienceDTO);
-                        conveniences.add(convenience);
-                    }
-                    configurationList.add(configuration);
-                }
-                configurationRepository.saveAll(configurationList);
-            }
-            roomsRepository.saveAll(roomsList);
-
-            hotelRepository.save(hotel);
-
-            userTransaction.commit();
-        } catch (NotSupportedException | RollbackException | HeuristicMixedException | HeuristicRollbackException | SystemException e) {
-            try {
-                userTransaction.rollback();
-            } catch (SystemException e1) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Hotel hasn't updated", e1);
-            }
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Hotel hasn't updated", e);
+        if (authentication == null || (authentication.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ADMIN"))
+                && !currentHotel.getOwner().equals(authentication.getName()))) {
+            throw new NotAHotelOwnerException("Current user isn't an admin or an owner of the current hotel");
         }
+
+        hotel.setCity(cityRepository.findById(hotelDTO.getCityId()).get());
+        hotel.setOwner(currentHotel.getOwner());
+
+        List<Rooms> roomsList = new ArrayList<>();
+        for (RoomsDTO roomsDTO : hotelDTO.getRooms()) {
+            Rooms rooms = roomsMapper.dtoToEntity(roomsDTO);
+            rooms.setHotel(hotel);
+            roomsList.add(rooms);
+
+            List<Configuration> configurationList = new ArrayList<>();
+            for (ConfigurationDTO configurationDTO : roomsDTO.getConfigurations()) {
+                Configuration configuration = configurationMapper.dtoToEntity(configurationDTO);
+                configuration.setRooms(rooms);
+                List<Convenience> conveniences = new ArrayList<>();
+                configuration.setConveniences(conveniences);
+
+                for (ConvenienceDTO convenienceDTO : configurationDTO.getConveniences()) {
+                    Convenience convenience = convenienceMapper.dtoToEntity(convenienceDTO);
+                    conveniences.add(convenience);
+                }
+                configurationList.add(configuration);
+            }
+            rooms.setConfigurations(configurationList);
+        }
+        hotel.setRooms(roomsList);
+
+        hotelRepository.save(hotel);
     }
 
     public HotelDTO getHotel(Integer id) {

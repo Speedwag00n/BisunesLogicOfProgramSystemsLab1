@@ -59,6 +59,9 @@ public class ReservationServiceImpl implements ReservationService {
     @Value("${bonuses.percent}")
     private Double bonusesPercent;
 
+    @Value("${bonuses.covering}")
+    private Double bonusesCovering;
+
     @Override
     public ReservationDTO makeReservation(ReservationDTO reservationDTO) {
         Reservation entity;
@@ -86,12 +89,14 @@ public class ReservationServiceImpl implements ReservationService {
             int mustPay = configurationRepository.findById(reservation.getConfiguration().getId()).get().getPrice();
 
             if (reservationDTO.getUseBonuses()) {
-                int usedBonuses = mustPay <= user.getBonuses() ? mustPay : user.getBonuses();
+                int usedBonuses = (int)Math.ceil(mustPay * bonusesCovering) <= user.getBonuses() ? (int)Math.ceil(mustPay * bonusesCovering) : user.getBonuses();
                 mustPay -= usedBonuses;
                 long timeDifference = reservation.getDepartureDate().getTime() - reservation.getArrivalDate().getTime();
                 int numberOfDays = (int) TimeUnit.DAYS.convert(timeDifference, TimeUnit.MILLISECONDS) + 1;
                 user.setBonuses(user.getBonuses() - usedBonuses + (int)Math.ceil(mustPay * numberOfDays* bonusesPercent));
             }
+
+            entity = reservationRepository.save(reservation);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -106,8 +111,6 @@ public class ReservationServiceImpl implements ReservationService {
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(paymentsURL, requestEntity, String.class);
-
-            entity = reservationRepository.save(reservation);
 
             if (!response.getStatusCode().equals(HttpStatus.OK)) {
                 userTransaction.rollback();
