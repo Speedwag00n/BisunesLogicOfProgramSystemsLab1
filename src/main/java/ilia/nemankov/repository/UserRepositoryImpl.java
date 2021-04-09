@@ -136,7 +136,11 @@ public class UserRepositoryImpl implements UserRepository {
             Element roles = document.createElement("roles");
             roles.appendChild(document.createTextNode(String.join(",", user.getRoles().toArray(new String[0]))));
             Element bonuses = document.createElement("bonuses");
-            bonuses.appendChild(document.createTextNode(user.getBonuses() + ""));
+            if (user.getBonuses() == null) {
+                bonuses.appendChild(document.createTextNode("0"));
+            } else {
+                bonuses.appendChild(document.createTextNode(user.getBonuses() + ""));
+            }
 
             newUser.appendChild(login);
             newUser.appendChild(password);
@@ -151,7 +155,7 @@ public class UserRepositoryImpl implements UserRepository {
             throw new UsersFileException(e);
         }
 
-        return user;
+        return findByLogin(user.getLogin());
     }
 
     private Document getDocument() throws IOException, SAXException, ParserConfigurationException {
