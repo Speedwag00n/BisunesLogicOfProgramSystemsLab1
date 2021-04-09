@@ -3,7 +3,6 @@ package ilia.nemankov.repository.specification;
 import ilia.nemankov.model.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-import sun.security.krb5.Config;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
