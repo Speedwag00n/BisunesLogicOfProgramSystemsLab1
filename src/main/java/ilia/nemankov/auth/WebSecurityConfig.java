@@ -44,9 +44,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .antMatchers(HttpMethod.POST, "/api/user").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/user").permitAll()
 
-                .antMatchers(HttpMethod.PUT, "/api/hotel/update").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/hotel/update").hasAnyAuthority("HOTEL_OWNER", "ADMIN")
                 .antMatchers(HttpMethod.POST, "/api/reservation").authenticated()
                 .antMatchers(HttpMethod.POST, "/api/logout").authenticated()
 
