@@ -5,7 +5,6 @@ import ilia.nemankov.mapper.UserMapper;
 import ilia.nemankov.model.User;
 import ilia.nemankov.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,6 +28,26 @@ public class UserServiceImpl implements UserService {
         } catch (Throwable e) {
             throw e;
         }
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userRepository.getAllUsers();
+        List<UserDTO> result = new ArrayList<>();
+        for (User user : users) {
+            result.add(userMapper.entityToDto(user));
+        }
+
+        return result;
+    }
+
+    @Override
+    public void updateUserBonuses(UserDTO userDTO) {
+        User user = userRepository.findByLogin(userDTO.getLogin());
+
+        user.setBonuses(userDTO.getBonuses());
+
+        userRepository.save(user);
     }
 
 }

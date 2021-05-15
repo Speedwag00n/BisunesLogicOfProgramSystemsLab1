@@ -26,10 +26,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -156,6 +153,38 @@ public class UserRepositoryImpl implements UserRepository {
         }
 
         return findByLogin(user.getLogin());
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        List<User> result = new ArrayList<>();
+
+        try {
+            Document document = getDocument();
+            NodeList users = document.getElementsByTagName("user");
+            for (int i = 0; i < users.getLength(); i++) {
+                Element element = (Element) users.item(i);
+
+                User user = new User();
+                user.setId(Integer.parseInt(element.getAttribute("id")));
+                user.setLogin(element.getElementsByTagName("login").item(0).getTextContent());
+                user.setPassword(element.getElementsByTagName("password").item(0).getTextContent());
+                user.setLastLogout(getDateFormat().parse(element.getElementsByTagName("lastLogout").item(0).getTextContent()));
+                user.setBonuses(Integer.parseInt(element.getElementsByTagName("bonuses").item(0).getTextContent()));
+                Set<String> roles = new HashSet<>();
+                user.setRoles(roles);
+                String rolesString = element.getElementsByTagName("roles").item(0).getTextContent();
+                if (rolesString.length() > 0) {
+                    Collections.addAll(roles, element.getElementsByTagName("roles").item(0).getTextContent().split(","));
+                }
+
+                result.add(user);
+            }
+        } catch (IOException | SAXException | ParserConfigurationException | ParseException e) {
+            throw new UsersFileException(e);
+        }
+
+        return result;
     }
 
     private Document getDocument() throws IOException, SAXException, ParserConfigurationException {

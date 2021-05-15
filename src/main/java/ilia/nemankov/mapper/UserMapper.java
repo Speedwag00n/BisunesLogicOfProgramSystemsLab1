@@ -21,4 +21,13 @@ public class UserMapper {
         return entity;
     }
 
+    public UserDTO entityToDto(User entity) {
+        UserDTO dto = new UserDTO();
+
+        dto.setLogin(entity.getLogin());
+        dto.setBonuses(entity.getBonuses());
+
+        return dto;
+    }
+
 }
