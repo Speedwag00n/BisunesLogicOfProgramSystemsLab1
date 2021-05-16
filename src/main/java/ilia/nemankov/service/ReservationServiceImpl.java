@@ -13,10 +13,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -121,10 +118,9 @@ public class ReservationServiceImpl implements ReservationService {
             userRepository.save(user);
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-            //ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(paymentsURL, requestEntity, String.class);
+            ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(paymentsURL, requestEntity, String.class);
 
-            //if (!response.getStatusCode().equals(HttpStatus.OK)) {
-            if (!true) {
+            if (!response.getStatusCode().equals(HttpStatus.OK)) {
                 userTransaction.rollback();
                 user.setBonuses(oldUserBonuses);
                 userRepository.save(user);
