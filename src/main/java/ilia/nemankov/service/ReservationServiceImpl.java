@@ -1,5 +1,6 @@
 package ilia.nemankov.service;
 
+import ilia.nemankov.dto.RecommendationMessageDTO;
 import ilia.nemankov.dto.ReservationDTO;
 import ilia.nemankov.mapper.ReservationMapper;
 import ilia.nemankov.model.Reservation;
@@ -7,10 +8,15 @@ import ilia.nemankov.model.User;
 import ilia.nemankov.repository.ConfigurationRepository;
 import ilia.nemankov.repository.ReservationRepository;
 import ilia.nemankov.repository.UserRepository;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,10 +39,13 @@ public class ReservationServiceImpl implements ReservationService {
     private final ConfigurationRepository configurationRepository;
     private final RestTemplateBuilder restTemplateBuilder;
     private final UserTransaction userTransaction;
+    private final AmqpTemplate template;
+    private final Queue queue;
 
     @Autowired
     public ReservationServiceImpl(ReservationMapper reservationMapper, ReservationRepository reservationRepository, ConfigurationService configurationService,
-        UserRepository userRepository, ConfigurationRepository configurationRepository, RestTemplateBuilder restTemplateBuilder, UserTransaction userTransaction) {
+                                  UserRepository userRepository, ConfigurationRepository configurationRepository, RestTemplateBuilder restTemplateBuilder, UserTransaction userTransaction,
+                                  AmqpTemplate template, Queue queue) {
 
         this.reservationMapper = reservationMapper;
         this.reservationRepository = reservationRepository;
@@ -45,6 +54,8 @@ public class ReservationServiceImpl implements ReservationService {
         this.configurationRepository = configurationRepository;
         this.restTemplateBuilder = restTemplateBuilder;
         this.userTransaction = userTransaction;
+        this.template = template;
+        this.queue = queue;
 
     }
 
@@ -110,9 +121,10 @@ public class ReservationServiceImpl implements ReservationService {
             userRepository.save(user);
 
             HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-            ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(paymentsURL, requestEntity, String.class);
+            //ResponseEntity<String> response = restTemplateBuilder.build().postForEntity(paymentsURL, requestEntity, String.class);
 
-            if (!response.getStatusCode().equals(HttpStatus.OK)) {
+            //if (!response.getStatusCode().equals(HttpStatus.OK)) {
+            if (!true) {
                 userTransaction.rollback();
                 user.setBonuses(oldUserBonuses);
                 userRepository.save(user);
@@ -130,6 +142,11 @@ public class ReservationServiceImpl implements ReservationService {
             }
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Reservation wasn't done", e);
         }
+
+        RecommendationMessageDTO message = new RecommendationMessageDTO();
+        message.setUserId(user.getId());
+        message.setConfigurationId(reservationDTO.getConfiguration());
+        template.convertAndSend(queue.getName(), message);
 
         return reservationMapper.entityToDto(entity);
     }
