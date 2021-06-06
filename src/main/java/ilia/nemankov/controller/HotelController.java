@@ -14,15 +14,6 @@ public class HotelController {
 
     private final HotelService hotelService;
 
-    @GetMapping("/api/hotel/{id}")
-    public ResponseEntity getHotelById(@PathVariable Integer id) {
-        try {
-            return ResponseEntity.status(200).body(hotelService.getHotel(id));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @PutMapping("/api/hotel/update")
     public ResponseEntity updateHotel(@RequestBody HotelDTO hotelDTO) {
         try {

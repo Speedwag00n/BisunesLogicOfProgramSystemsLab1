@@ -75,7 +75,7 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation entity;
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByLogin(authentication.getName());
+        User user = userRepository.findByLogin(authentication.getName()).get();
         Integer oldUserBonuses = user.getBonuses();
 
         try {

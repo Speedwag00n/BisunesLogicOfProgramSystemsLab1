@@ -27,7 +27,7 @@ public class RecommendationsConsumerImpl implements RecommendationsConsumer {
     @Override
     public void onMessage(Message message) {
         try {
-            System.out.println("Started to process new message");
+            System.out.println("\n>>> Started to process new message <<<\n");
 
             byte[] data = new byte[1024];
             ((RMQBytesMessage)message).readBytes(data);
@@ -45,7 +45,7 @@ public class RecommendationsConsumerImpl implements RecommendationsConsumer {
 
             Thread.sleep(20 * 1000);
 
-            System.out.println("Finished to process new message");
+            System.out.println("\n>>> Finished to process new message <<<\n");
         } catch (IOException | ClassNotFoundException | JMSException | InterruptedException e) {
             System.out.println("Failed to process recommendation message");
             e.printStackTrace();

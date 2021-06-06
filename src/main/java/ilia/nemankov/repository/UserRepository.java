@@ -1,23 +1,14 @@
 package ilia.nemankov.repository;
 
 import ilia.nemankov.model.User;
-import ilia.nemankov.service.UsersFileException;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface UserRepository {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findByLogin(String login) throws UsersFileException;
-
-    User save(User user) throws UsersFileException;
-
-    List<User> getAllUsers();
+    Optional<User> findByLogin(String login);
 
 }

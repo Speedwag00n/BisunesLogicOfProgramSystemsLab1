@@ -17,13 +17,10 @@ import ilia.nemankov.repository.ConfigurationRepository;
 import ilia.nemankov.repository.HotelRepository;
 import ilia.nemankov.repository.RoomsRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,35 +77,6 @@ public class HotelServiceImpl implements HotelService {
         hotel.setRooms(roomsList);
 
         hotelRepository.save(hotel);
-    }
-
-    public HotelDTO getHotel(Integer id) {
-        Hotel hotel = hotelRepository.findById(id).get();
-
-        HotelDTO hotelDTO = hotelMapper.entityToDto(hotel);
-        List<RoomsDTO> roomsDTOs = new ArrayList<>();
-        hotelDTO.setRooms(roomsDTOs);
-
-        for (Rooms rooms : hotel.getRooms()) {
-            RoomsDTO roomsDTO = roomsMapper.entityToDto(rooms);
-            roomsDTOs.add(roomsDTO);
-            List<ConfigurationDTO> configurationDTOs = new ArrayList<>();
-            roomsDTO.setConfigurations(configurationDTOs);
-
-            for (Configuration configuration : rooms.getConfigurations()) {
-                ConfigurationDTO configurationDTO = configurationMapper.entityToDto(configuration);
-                configurationDTOs.add(configurationDTO);
-                List<ConvenienceDTO> convenienceDTOs = new ArrayList<>();
-                configurationDTO.setConveniences(convenienceDTOs);
-
-                for (Convenience convenience : configuration.getConveniences()) {
-                    ConvenienceDTO convenienceDTO = convenienceMapper.entityToDto(convenience);
-                    convenienceDTOs.add(convenienceDTO);
-                }
-            }
-        }
-
-        return hotelDTO;
     }
 
 }

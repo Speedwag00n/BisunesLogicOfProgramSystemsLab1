@@ -55,13 +55,13 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        User user = userRepository.findByLogin(login);
+        User user = userRepository.findByLogin(login).get();
         if (user == null) {
             throw new UsernameNotFoundException("User with login " + login + " not found");
         }
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (String role : user.getRoles()) {
+        for (String role : user.getRoles().split(",")) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
 
@@ -70,7 +70,7 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
 
     @Override
     public String login(UserDTO user) {
-        User entity = userRepository.findByLogin(user.getLogin());
+        User entity = userRepository.findByLogin(user.getLogin()).get();
         if (entity != null) {
             long id = entity.getId();
             return login(user, id);
@@ -88,7 +88,7 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
 
     @Override
     public void logout(String login) {
-        User entity = userRepository.findByLogin(login);
+        User entity = userRepository.findByLogin(login).get();
 
         Date lastLogout = new Date();
         entity.setLastLogout(lastLogout);
@@ -98,7 +98,7 @@ public class JwtServiceImpl implements UserDetailsService, JwtService {
 
     @Override
     public Date loadLastLogout(String login) {
-        User entity = userRepository.findByLogin(login);
+        User entity = userRepository.findByLogin(login).get();
         return entity.getLastLogout();
     }
 

@@ -1,7 +1,6 @@
 package ilia.nemankov.controller;
 
 import ilia.nemankov.dto.HotelDTO;
-import ilia.nemankov.service.DirectionService;
 import ilia.nemankov.service.FilterService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,17 +16,7 @@ import java.util.List;
 @RestController
 public class FilterController {
 
-    private final DirectionService directionService;
     private final FilterService filterService;
-
-    @GetMapping("/api/directions")
-    public ResponseEntity getDirections() {
-        try {
-            return ResponseEntity.ok(directionService.getDirections());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
     @GetMapping("/api/hotels")
     public ResponseEntity getSuitableHotels(

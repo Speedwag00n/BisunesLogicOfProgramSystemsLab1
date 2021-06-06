@@ -2,21 +2,26 @@ package ilia.nemankov.model;
 
 import lombok.Data;
 
+import javax.persistence.*;
 import java.util.Date;
-import java.util.Set;
 
+@Entity
 @Data
+@Table(name = "USERS")
 public class User {
 
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String login;
 
     private String password;
 
+    @Column(name = "LAST_LOGOUT")
     private Date lastLogout;
 
-    private Set<String> roles;
+    private String roles;
 
     private Integer bonuses;
 

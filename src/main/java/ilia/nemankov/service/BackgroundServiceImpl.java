@@ -1,5 +1,6 @@
 package ilia.nemankov.service;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import ilia.nemankov.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,12 +19,19 @@ public class BackgroundServiceImpl implements BackgroundService {
     @Value("${bonuses.daily.maxamount}")
     private Integer maxAmount;
 
+    @Value("${is.main.instance}")
+    private Boolean isMainInstance;
+
     public BackgroundServiceImpl(UserService userService) {
         this.userService = userService;
     }
 
     @Scheduled(cron="0 0 0 * * *")
     public void addDailyBonuses() {
+        if (!isMainInstance) {
+            return;
+        }
+
         List<UserDTO> users = userService.getAllUsers();
 
         for (UserDTO user : users) {

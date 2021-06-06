@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
         User entity = userMapper.dtoToEntity(user);
         Date registrationTime = new Date();
         entity.setLastLogout(registrationTime);
-        Set<String> roles = new HashSet<>();
+        String roles = "";
         entity.setRoles(roles);
         try {
             return userRepository.save(entity).getId();
@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDTO> getAllUsers() {
-        List<User> users = userRepository.getAllUsers();
+        List<User> users = userRepository.findAll();
         List<UserDTO> result = new ArrayList<>();
         for (User user : users) {
             result.add(userMapper.entityToDto(user));
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserBonuses(UserDTO userDTO) {
-        User user = userRepository.findByLogin(userDTO.getLogin());
+        User user = userRepository.findByLogin(userDTO.getLogin()).get();
 
         user.setBonuses(userDTO.getBonuses());
 
